@@ -44,8 +44,8 @@ def authUser(user, password):
     else:
         return False
 
-#create gui
-class Application(tk.Frame):
+#create  login gui
+class Login(tk.Frame):
     def __init__(self,master=None):
         super().__init__(master)
 
@@ -60,7 +60,7 @@ class Application(tk.Frame):
         #buttons
     def create_widgets(self):
         # username display
-        self.username_label = tk.Label(self, text='Username:', font=('Helvetica', 12), bg='#f5f5f5')
+        self.username_label = tk.Label(self, text='Email:', font=('Helvetica', 12), bg='#f5f5f5')
         self.username_label.pack(pady=(20, 0))
 
         self.username_entry = tk.Entry(self, font=('Helvetica', 12), bg='#ffffff')
@@ -108,6 +108,9 @@ class Application(tk.Frame):
         if user and passw:
             if authUser(user,passw):
                 tk.messagebox.showinfo('Success', 'Login Successful')
+                self.destroy()
+                HomePage(self.master)
+                return
             else:
                 tk.messagebox.showerror('error', 'incorrect combo')
         else:
@@ -115,8 +118,28 @@ class Application(tk.Frame):
         self.username_entry.delete(0,tk.END)
         self.password_entry.delete(0,tk.END)
 
+class HomePage(tk.Frame):
+    def __init__(self,master=None):
+        super().__init__(master)
+        self.master=master
+        self.master.title('Home Page')
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.welcome=tk.Label(self, text='Welcome')
+        self.welcome.pack()
+        self.logout=tk.Button(self,text='Logout', command=self.logout_page)
+        self.logout.pack()
+
+    def logout_page(self):
+        self.destroy()
+        login_page=Login(self.master)
+        login_page.pack(fill='both', expand=True)
+
 #main
 root=tk.Tk()
-app=Application(master=root)
+app=Login(root)
+home=HomePage(root)
 app.pack(fill='both',expand=True)
+home.pack(fill='both',expand=True)
 app.mainloop()

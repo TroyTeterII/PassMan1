@@ -2,6 +2,7 @@ import sqlite3
 import hashlib
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import simpledialog
 import re
 
 print('launching passman')
@@ -78,7 +79,7 @@ class Login(tk.Frame):
         self.button_frame.pack(pady=(20,0))
         
         self.register_button = tk.Button(self, text='Register', font=('Helvetica', 12), bg='#007bff', fg='#ffffff', command=lambda: self.register_user())
-        self.register_button.pack(side=tk.LEFT)
+        self.register_button.pack(side=tk.LEFT, anchor=tk.SW)
 
         #login button display
         self.login_button=tk.Button(self.button_frame,text='Login', font=('Helvetica',12), bg='#28a745', fg='#ffffff', command=lambda: self.login_user())
@@ -118,6 +119,7 @@ class Login(tk.Frame):
         self.username_entry.delete(0,tk.END)
         self.password_entry.delete(0,tk.END)
 
+#home page screen
 class HomePage(tk.Frame):
     def __init__(self,master=None):
         super().__init__(master)
@@ -126,15 +128,58 @@ class HomePage(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        #welcome label
         self.welcome=tk.Label(self, text='Welcome')
         self.welcome.pack()
+        #logout button
         self.logout=tk.Button(self,text='Logout', command=self.logout_page)
-        self.logout.pack()
+        self.logout.pack(side=tk.LEFT, anchor=tk.SW)
+        #new entry button
+        self.entry=tk.Button(self,text='New Entry',command=self.entry_page)
+        self.entry.pack()
 
+    #logout fuctnion
     def logout_page(self):
         self.destroy()
         login_page=Login(self.master)
         login_page.pack(fill='both', expand=True)
+
+    #new entry button
+    def entry_page(self):
+        entry_input=tk.Toplevel(self)
+        entry_input.title('New Entry')
+
+        website_frame = tk.Frame(entry_input)
+        website_frame.pack(padx=10, pady=10)
+        website_label = tk.Label(website_frame, text='Website:')
+        website_label.pack(side=tk.LEFT)
+        website_entry = tk.Entry(website_frame)
+        website_entry.pack(side=tk.LEFT)
+        
+        user_frame = tk.Frame(entry_input)
+        user_frame.pack(padx=10, pady=10)
+        user_label = tk.Label(user_frame, text='Username:')
+        user_label.pack(side=tk.LEFT)
+        user_entry = tk.Entry(user_frame)
+        user_entry.pack(side=tk.LEFT)
+        
+        pass_frame = tk.Frame(entry_input)
+        pass_frame.pack(padx=10, pady=10)
+        pass_label = tk.Label(pass_frame, text='Password:')
+        pass_label.pack(side=tk.LEFT)
+        pass_entry = tk.Entry(pass_frame)
+        pass_entry.pack(side=tk.LEFT)
+
+        submit_button=tk.Button(entry_input,text='Submit New Entry',command=lambda: self.submit_page(website_entry.get(),user_entry.get(),pass_entry.get()))
+        submit_button.pack()
+
+    def submit_page(self, website, user, password):
+        if website and user and password:
+            print(f'Website: {website}')
+            print(f'Username: {user}')
+            print(f'Password: {password}')
+        else:
+            tk.messagebox.showerror('error','please fill in all fields')
 
 #main
 root=tk.Tk()

@@ -40,7 +40,19 @@ def create_database(user):
     except IOError:
         print('error occured')
         return None
-
+    
+#function to create a table in the users db file, store new entry input into table
+def create_table(website,user,password):
+    database_dir='data'
+    db_file=os.path.join(database_dir,f'{user}_db.db')
+    conn=sqlite3.connect(db_file)
+    c=conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS userdata
+                 (website TEXT, user TEXT, password TEXT)''')
+    hashed_pass=hashlib.sha256(password.encode()).hexdigest()
+    c.execute('INSERT INTO userdata VALUES (?,?,?)',(website,user,hashed_pass))
+    conn.commit()
+    conn.close()
 
 #function to check for valid emails using regex
 def is_valid_email(email):
@@ -219,10 +231,17 @@ class HomePage(tk.Frame):
         if website and user and password:
             if is_valid_email(user)==False:
                 tk.messagebox.showerror('error', 'invalid email address')
+                return
             if valid_url(website) == False:
                 tk.messagebox.showerror('error', 'invalid URL')
+                return
+            user_db=f'{user}_db.db'
+            create_table(website,user,password)
+            tk.messagebox.showinfo('Success', 'Entry added to db')
+            self.destroy()
         else:
             tk.messagebox.showerror('error','please fill in all fields')
+
 
 #main
 root=tk.Tk()

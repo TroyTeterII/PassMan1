@@ -1,10 +1,10 @@
 import sqlite3
 import hashlib
 import tkinter as tk
+import re
 from tkinter import messagebox
 from tkinter import simpledialog
-import re
-
+from urllib.parse import urlparse
 print('launching passman')
 
 #database and table
@@ -43,6 +43,14 @@ def authUser(user, password):
     if result is not None:
         return True
     else:
+        return False
+
+#checks a string for valid url    
+def valid_url(url):
+    try:
+        result=urlparse(url)
+        return all([result.scheme,result.netloc])
+    except ValueError:
         return False
 
 #create  login gui
@@ -124,19 +132,27 @@ class HomePage(tk.Frame):
     def __init__(self,master=None):
         super().__init__(master)
         self.master=master
-        self.master.title('Home Page')
+        self.master.title('PassMan')
+        self.master.geometry('400x200')
+        self.master.resizable(False,False)
+        self.configure(bg='#f5f5f5')
         self.create_widgets()
 
     def create_widgets(self):
         #welcome label
         self.welcome=tk.Label(self, text='Welcome')
         self.welcome.pack()
-        #logout button
-        self.logout=tk.Button(self,text='Logout', command=self.logout_page)
-        self.logout.pack(side=tk.LEFT, anchor=tk.SW)
+
+        button_frame=tk.Frame(self)
+        button_frame.pack(side=tk.LEFT)
+        
         #new entry button
         self.entry=tk.Button(self,text='New Entry',command=self.entry_page)
-        self.entry.pack()
+        self.entry.pack(side=tk.TOP,anchor=tk.NW)
+
+        #logout button
+        self.logout=tk.Button(self,text='Logout', command=self.logout_page)
+        self.logout.pack(side=tk.BOTTOM,anchor=tk.SW)
 
     #logout fuctnion
     def logout_page(self):
@@ -144,11 +160,12 @@ class HomePage(tk.Frame):
         login_page=Login(self.master)
         login_page.pack(fill='both', expand=True)
 
-    #new entry button
+    #new entry popup 
     def entry_page(self):
         entry_input=tk.Toplevel(self)
         entry_input.title('New Entry')
 
+        #needs better formatting for entry buttons
         website_frame = tk.Frame(entry_input)
         website_frame.pack(padx=10, pady=10)
         website_label = tk.Label(website_frame, text='Website:')
@@ -167,7 +184,7 @@ class HomePage(tk.Frame):
         pass_frame.pack(padx=10, pady=10)
         pass_label = tk.Label(pass_frame, text='Password:')
         pass_label.pack(side=tk.LEFT)
-        pass_entry = tk.Entry(pass_frame)
+        pass_entry = tk.Entry(pass_frame,show='*')
         pass_entry.pack(side=tk.LEFT)
 
         submit_button=tk.Button(entry_input,text='Submit New Entry',command=lambda: self.submit_page(website_entry.get(),user_entry.get(),pass_entry.get()))
@@ -175,9 +192,10 @@ class HomePage(tk.Frame):
 
     def submit_page(self, website, user, password):
         if website and user and password:
-            print(f'Website: {website}')
-            print(f'Username: {user}')
-            print(f'Password: {password}')
+            if is_valid_email(user)==False:
+                tk.messagebox.showerror('error', 'invalid email address')
+            if valid_url(website) == False:
+                tk.messagebox.showerror('error', 'invalid URL')
         else:
             tk.messagebox.showerror('error','please fill in all fields')
 

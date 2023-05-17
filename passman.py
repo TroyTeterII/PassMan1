@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import hashlib
 import tkinter as tk
@@ -12,12 +13,34 @@ dbName='passwords.db'
 tableName='users'
 
 #db connection
-conn=sqlite3.connect(dbName)
-c=conn.cursor()
+main_conn=sqlite3.connect(dbName)
+main_c=main_conn.cursor()
 
 #table check
-c.execute('''CREATE TABLE IF NOT EXISTS {} (username text, password text)'''.format(tableName))
-conn.commit()
+main_c.execute('''CREATE TABLE IF NOT EXISTS {} (username text, password text)'''.format(tableName))
+main_conn.commit()
+
+#create new database for the user
+def create_database(user):
+    #create a directory folder for the user tables
+    database_dir='data'
+    os.makedirs(database_dir,exist_ok=True)
+    user_db= os.path.join(database_dir,f'{user}_db.db')
+    #checks for duplicate files
+    if os.path.exists(user_db):
+        print('database file already exists')
+        print(os.path.abspath(user_db))
+        return False
+    try:
+        #file creation
+        with open(user_db, 'w'):
+            print('file created')
+            print(os.path.abspath(user_db))
+            return True
+    except IOError:
+        print('error occured')
+        return None
+
 
 #function to check for valid emails using regex
 def is_valid_email(email):
@@ -26,20 +49,20 @@ def is_valid_email(email):
 
 #function to check if email has already been registered
 def is_email_used(email):
-    c.execute('SELECT * FROM {} WHERE username=?'.format(tableName), (email,))
-    return c.fetchone() is not None
+    main_c.execute('SELECT * FROM {} WHERE username=?'.format(tableName), (email,))
+    return main_c.fetchone() is not None
 
 #add new user and hash their password
 def addUser(user, password):
     hashPass=hashlib.sha256(password.encode()).hexdigest()
-    c.execute('INSERT INTO {} VALUES (?,?)'.format(tableName), (user, hashPass))
-    conn.commit()
+    main_c.execute('INSERT INTO {} VALUES (?,?)'.format(tableName), (user, hashPass))
+    main_conn.commit()
 
 #simple user authentication
 def authUser(user, password):
     hashPass=hashlib.sha256(password.encode()).hexdigest()
-    c.execute('SELECT * FROM {} WHERE username=? AND password =?'.format(tableName), (user, hashPass))
-    result=c.fetchone()
+    main_c.execute('SELECT * FROM {} WHERE username=? AND password =?'.format(tableName), (user, hashPass))
+    result=main_c.fetchone()
     if result is not None:
         return True
     else:
@@ -114,14 +137,18 @@ class Login(tk.Frame):
     def login_user(self):
         user=self.username_entry.get()
         passw=self.password_entry.get()
+
         if user and passw:
             if authUser(user,passw):
                 tk.messagebox.showinfo('Success', 'Login Successful')
+                create_database(user)
                 self.destroy()
                 HomePage(self.master)
                 return
+            
             else:
                 tk.messagebox.showerror('error', 'incorrect combo')
+
         else:
             tk.messagebox.showerror('error', 'please enter user and passw')
         self.username_entry.delete(0,tk.END)

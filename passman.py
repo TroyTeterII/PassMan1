@@ -165,30 +165,27 @@ class HomePage(tk.Frame):
         entry_input=tk.Toplevel(self)
         entry_input.title('New Entry')
 
-        #needs better formatting for entry buttons
-        website_frame = tk.Frame(entry_input)
-        website_frame.pack(padx=10, pady=10)
-        website_label = tk.Label(website_frame, text='Website:')
-        website_label.pack(side=tk.LEFT)
-        website_entry = tk.Entry(website_frame)
-        website_entry.pack(side=tk.LEFT)
-        
-        user_frame = tk.Frame(entry_input)
-        user_frame.pack(padx=10, pady=10)
-        user_label = tk.Label(user_frame, text='Username:')
-        user_label.pack(side=tk.LEFT)
-        user_entry = tk.Entry(user_frame)
-        user_entry.pack(side=tk.LEFT)
-        
-        pass_frame = tk.Frame(entry_input)
-        pass_frame.pack(padx=10, pady=10)
-        pass_label = tk.Label(pass_frame, text='Password:')
-        pass_label.pack(side=tk.LEFT)
-        pass_entry = tk.Entry(pass_frame,show='*')
-        pass_entry.pack(side=tk.LEFT)
+         # Website
+        website_label = tk.Label(entry_input, text='Website:')
+        website_label.grid(row=0, column=0, sticky=tk.E)
+        website_entry = tk.Entry(entry_input)
+        website_entry.grid(row=0, column=1, padx=5,pady=5)
 
-        submit_button=tk.Button(entry_input,text='Submit New Entry',command=lambda: self.submit_page(website_entry.get(),user_entry.get(),pass_entry.get()))
-        submit_button.pack()
+        # Username
+        user_label = tk.Label(entry_input, text='Username:')
+        user_label.grid(row=1, column=0, sticky=tk.E)
+        user_entry = tk.Entry(entry_input)
+        user_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        # Password
+        pass_label = tk.Label(entry_input, text='Password:')
+        pass_label.grid(row=2, column=0, sticky=tk.E)
+        pass_entry = tk.Entry(entry_input, show='*')
+        pass_entry.grid(row=2, column=1, padx=5,pady=5)
+
+        # Submit button
+        submit_button = tk.Button(entry_input, text='Submit New Entry', command=lambda: self.submit_page(website_entry.get(), user_entry.get(), pass_entry.get()))
+        submit_button.grid(row=3, column=0, columnspan=2,padx=5,pady=10)
 
     def submit_page(self, website, user, password):
         if website and user and password:

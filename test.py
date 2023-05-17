@@ -143,7 +143,8 @@ class Login(tk.Frame):
                 tk.messagebox.showinfo('Success', 'Login Successful')
                 create_database(user)
                 self.destroy()
-                HomePage(self.master)
+                home= HomePage(self.master)
+                home.pack(fill='both',expand=True)
                 return
             
             else:
@@ -226,7 +227,5 @@ class HomePage(tk.Frame):
 #main
 root=tk.Tk()
 app=Login(root)
-home=HomePage(root)
 app.pack(fill='both',expand=True)
-home.pack(fill='both',expand=True)
 app.mainloop()

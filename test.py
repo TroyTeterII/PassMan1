@@ -84,11 +84,8 @@ def authUser(user, password):
 
 #checks a string for valid url    
 def valid_url(url):
-    try:
-        result=urlparse(url)
-        return all([result.scheme,result.netloc])
-    except ValueError:
-        return False
+    pattern = re.compile(r"^(https?://)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$")
+    return bool(pattern.match(url))
 
 #create  login gui
 class Login(tk.Frame):
@@ -175,6 +172,10 @@ class HomePage(tk.Frame):
         self.configure(bg='#f5f5f5')
         self.create_widgets()
 
+    #function to initialize clipboard
+    def init_clipboard(self):
+        self.clipboard=self.clipboard_get()
+
     def create_widgets(self):
         #welcome label
         self.welcome=tk.Label(self, text='Home Page')
@@ -193,6 +194,9 @@ class HomePage(tk.Frame):
         #logout button
         self.logout=tk.Button(self,text='Logout', command=self.logout_page)
         self.logout.pack(side=tk.BOTTOM,anchor=tk.SW)
+        
+        #initializing keyboard
+        self.master.after(0, self.init_clipboard)
 
     #logout function
     def logout_page(self):
@@ -243,7 +247,7 @@ class HomePage(tk.Frame):
         #paste command handling
         def paste_entry(entry):
             entry.delete(0,tk.END)
-            entry.insert(tk.END,self.clipboard.get())
+            entry.insert(tk.END,entry.clipboard_get())
 
         # Website
         website_label = tk.Label(entry_input, text='Website:')

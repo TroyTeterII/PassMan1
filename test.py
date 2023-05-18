@@ -171,9 +171,10 @@ class HomePage(tk.Frame):
         self.master.resizable(False,False)
         self.configure(bg='#f5f5f5')
         self.create_widgets()
+        self.get_clipboard()
 
-    #function to initialize clipboard
-    def init_clipboard(self):
+    #function to init clipboard
+    def get_clipboard(self):
         self.clipboard=self.clipboard_get()
 
     def create_widgets(self):
@@ -194,9 +195,9 @@ class HomePage(tk.Frame):
         #logout button
         self.logout=tk.Button(self,text='Logout', command=self.logout_page)
         self.logout.pack(side=tk.BOTTOM,anchor=tk.SW)
-        
-        #initializing keyboard
-        self.master.after(0, self.init_clipboard)
+
+        #initializing clipboard
+        self.master.after(0, self.get_clipboard)
 
     #logout function
     def logout_page(self):
@@ -235,9 +236,6 @@ class HomePage(tk.Frame):
             context_menu.post(event.x_root, event.y_root)
 
         popup_text.bind("<Button-3>", show_context_menu)
-
-
-
 
     #new entry popup 
     def entry_page(self):

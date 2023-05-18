@@ -210,11 +210,27 @@ class HomePage(tk.Frame):
         length=12
         secpass=''.join(random.choices(totalchar,k=length))
 
-        pop_win=tk.Tk()
-        pop_entry=tk.Entry(pop_win,readonlybackground='white')
-        pop_entry.insert(0,secpass)
-        pop_entry.pack(fill='both',expand=True)
-        pop_entry.configure(state='readonly')
+        def copy_selected_text():
+            selected_text = popup_text.get("sel.first", "sel.last")
+            if selected_text:
+                self.clipboard_clear()
+                self.clipboard_append(selected_text)
+
+        popup_window = tk.Toplevel(self)
+        popup_window.title('New Password')
+
+        popup_text = tk.Text(popup_window,height=3,width=30)
+        popup_text.insert("1.0", secpass)
+        popup_text.pack(fill='both', expand=True,padx=1,pady=1)
+        popup_text.configure(state="disabled")
+
+        context_menu = tk.Menu(popup_text, tearoff=0)
+        context_menu.add_command(label="Copy", command=copy_selected_text)
+
+        def show_context_menu(event):
+            context_menu.post(event.x_root, event.y_root)
+
+        popup_text.bind("<Button-3>", show_context_menu)
 
 
 
@@ -223,21 +239,41 @@ class HomePage(tk.Frame):
     def entry_page(self):
         entry_input=tk.Toplevel(self)
         entry_input.title('New Entry')
-         # Website
+
+        #paste command handling
+        def paste_entry(entry):
+            entry.delete(0,tk.END)
+            entry.insert(tk.END,self.clipboard.get())
+
+        # Website
         website_label = tk.Label(entry_input, text='Website:')
         website_label.grid(row=0, column=0, sticky=tk.E)
         website_entry = tk.Entry(entry_input)
         website_entry.grid(row=0, column=1, padx=5,pady=5)
+        website_entry.bind('<Button-3>', lambda event: context_menu.post(event.x_root, event.y_root))
+        
         # Username
         user_label = tk.Label(entry_input, text='Username:')
         user_label.grid(row=1, column=0, sticky=tk.E)
         user_entry = tk.Entry(entry_input)
         user_entry.grid(row=1, column=1, padx=5, pady=5)
+        user_entry.bind('<Button-3>', lambda event: context_menu.post(event.x_root, event.y_root))
+        
         # Password
         pass_label = tk.Label(entry_input, text='Password:')
         pass_label.grid(row=2, column=0, sticky=tk.E)
         pass_entry = tk.Entry(entry_input, show='*')
         pass_entry.grid(row=2, column=1, padx=5,pady=5)
+        pass_entry.bind('<Button-3>', lambda event: context_menu.post(event.x_root, event.y_root))
+
+        #context menu keybind
+        def show_context(event):
+            context_menu.post(event.x_root,event.y_root)
+
+        #context menu with paste option
+        context_menu=tk.Menu(entry_input,tearoff=0)
+        context_menu.add_command(label='Paste',command=lambda: paste_entry(entry_input.focus_get()))
+
         # Submit button
         submit_button = tk.Button(entry_input, text='Submit New Entry', command=lambda: self.submit_page(website_entry.get(), user_entry.get(), pass_entry.get()))
         submit_button.grid(row=3, column=0, columnspan=2,padx=5,pady=10)

@@ -172,10 +172,16 @@ class HomePage(tk.Frame):
         self.configure(bg='#f5f5f5')
         self.create_widgets()
         self.get_clipboard()
-
+        
     #function to init clipboard
     def get_clipboard(self):
-        self.clipboard=self.clipboard_get()
+        try:
+            self.clipboard=self.clipboard_get()
+        except tk.TclError:
+            print('clipboard empty')
+            self.clipboard = None
+
+
 
     def create_widgets(self):
         #welcome label

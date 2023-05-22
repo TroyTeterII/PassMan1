@@ -172,13 +172,12 @@ class HomePage(tk.Frame):
         self.configure(bg='#f5f5f5')
         self.create_widgets()
         self.get_clipboard()
-        
+
     #function to init clipboard
     def get_clipboard(self):
         try:
             self.clipboard=self.clipboard_get()
         except tk.TclError:
-            print('clipboard empty')
             self.clipboard = None
 
 
@@ -195,8 +194,11 @@ class HomePage(tk.Frame):
         self.entry.pack(side=tk.TOP,anchor=tk.NW)
 
         #generate password button
-        self.entry=tk.Button(self,text='Generate A New Password',command=self.generate_page)
-        self.entry.pack(side=tk.TOP,anchor=tk.W)
+        self.password=tk.Button(self,text='Generate A New Password',command=self.generate_page)
+        self.password.pack(side=tk.TOP,anchor=tk.W)
+
+        self.get_password=tk.Button(self,text='retrieve your passwords',command=self.retrieve_page)
+        self.get_password.pack(side=tk.TOP,anchor=tk.W)
 
         #logout button
         self.logout=tk.Button(self,text='Logout', command=self.logout_page)
@@ -210,6 +212,48 @@ class HomePage(tk.Frame):
         self.destroy()
         login_page=Login(self.master)
         login_page.pack(fill='both', expand=True)
+
+    def retrieve_page(self):
+        popup = tk.Toplevel(self.master)
+        popup.title('Verify Login Info')
+
+        # Username label and entry
+        username_label = tk.Label(popup, text='Username:')
+        username_label.pack()
+        self.username_entry = tk.Entry(popup)
+        self.username_entry.pack()
+
+        # Password label and entry
+        password_label = tk.Label(popup, text='Password:')
+        password_label.pack()
+        self.password_entry = tk.Entry(popup, show='*')
+        self.password_entry.pack()
+
+        # Submit button
+        submit_button = tk.Button(popup, text='Submit', command=self.retrieve_password)
+        submit_button.pack()
+
+    def retrieve_password(self):
+        user=self.username_entry.get()
+        password=self.password_entry.get()
+
+        #authenticate user information
+        if authUser(user,password) == False:
+            tk.messagebox.showerror('error','invalid login info')
+        if authUser(user,password)==True:
+            print(user)
+            print(password)
+
+            #query database using username
+
+            #user_db=f'{user}_db.db'
+            #conn=sqlite3.connect(user_db)
+            #cursor=conn.cursor()
+
+            #decrypt password column
+            #output website,username,decrypted passwords
+            #format data and gui
+
 
     #generate password popup
     def generate_page(self):

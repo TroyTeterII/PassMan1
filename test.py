@@ -72,7 +72,7 @@ def addUser(user, password):
     main_c.execute('INSERT INTO {} VALUES (?,?)'.format(tableName), (user, hashPass))
     main_conn.commit()
 
-#simple user authentication
+#simple user authentication NEED SECURITY
 def authUser(user, password):
     hashPass=hashlib.sha256(password.encode()).hexdigest()
     main_c.execute('SELECT * FROM {} WHERE username=? AND password =?'.format(tableName), (user, hashPass))
@@ -236,19 +236,36 @@ class HomePage(tk.Frame):
     def retrieve_password(self):
         user=self.username_entry.get()
         password=self.password_entry.get()
-
         #authenticate user information
         if authUser(user,password) == False:
             tk.messagebox.showerror('error','invalid login info')
         if authUser(user,password)==True:
             print(user)
             print(password)
+            #query database using username, NEEDS SECURITY
+            database_dir='data'
+            user_db=os.path.join(database_dir,f'{user}_db.db')
+            user_db_absolute=os.path.abspath(user_db)
 
-            #query database using username
+            db_name = user+'_db.db' 
 
-            #user_db=f'{user}_db.db'
-            #conn=sqlite3.connect(user_db)
-            #cursor=conn.cursor()
+            print(user_db)
+            print(user_db_absolute)
+            conn=sqlite3.connect(user_db_absolute)
+            cursor=conn.cursor()
+            try:
+                query=f'SELECT "website","user","password" FROM userdata'
+                cursor.execute(query)
+                results=cursor.fetchall()
+                for row in results:
+                    website,username,password = row
+                    print(website)
+                    print(username)
+                    print(password)
+            except sqlite3.Error as error:
+                print('Error',error)
+            conn.close()
+                
 
             #decrypt password column
             #output website,username,decrypted passwords
